@@ -3,10 +3,16 @@
 #include <motorControl.h>
 #include <SoftwareSerial.h>
 #include <Arduino.h>
+#include <string.h>
+//#include <TInyGPS++.h>
+//#include <gps.h>
 
 const int Bluetooth_tx = 8;
 const int Bluetooth_rx = 7;
 bool isDriving = false;
+//SoftwareSerial gpsSerial(RX,TX);
+//TinyGPSPlus gps;
+
 SoftwareSerial bluetooth(Bluetooth_tx, Bluetooth_rx);
 ArduinoBlue phone(bluetooth);
 
@@ -35,6 +41,7 @@ void drive(){
 void setup(){
 	Serial.begin(9600);
 	bluetooth.begin(9600);
+//	gpsSerial.begin(9600);
 	initMotorPins();
 	initSensorPins();
 }
@@ -55,5 +62,32 @@ void loop(){
 	}else{
 		stop();
 	}
+	String str = phone.getText();
+	char buffer[30];
+	str.toCharArray(buffer, sizeof(buffer));
+	double latitude;
+	double longitude;
+	char* token = strtok(buffer, ",");
+	if(token != NULL){
+		latitude = atof(token);
+	}
+	token = strtok(NULL, ",");
+	if(token != NULL){
+		longitude = atof(token);
+	}
+	if(str != ""){
+		Serial.println(latitude,6);
+		Serial.println(longitude,6);
+	}
+	/*
+	if(toPoint){
 
+		while(gpsSerial.available() > 0) gps.encode(gpsSerial.read());
+
+		if(gps.location.isValid()){
+			
+		}
+
+	}
+	*/
 }
